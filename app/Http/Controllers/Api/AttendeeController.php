@@ -14,6 +14,8 @@ class AttendeeController extends Controller
     use CanLoadRelationships;
     public function __construct(){
         $this->middleware('auth:sanctum')->except(['index','show']);
+        $this->authorizeResource(Attendee::class, 'event');
+
     }
 
     /**
