@@ -31,6 +31,18 @@ class AttendeeController extends Controller
         return new AttendeeResource($attendee);
     }
 
+    public function shouldIncludeRelation(string $relation)
+    {
+        //get query params 
+        $include = request()->query('include');
+        if (!$include) {
+            return false;
+        }
+
+        $relations = array_map('trim',explode(',', $include));
+        return in_array($relation, $relations);
+    }
+
     /**
      * Display the specified resource.
      */
