@@ -4,11 +4,18 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AttendeeResource;
+use App\Http\Traits\CanLoadRelationships;
+use App\Models\Attendee;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
 class AttendeeController extends Controller
 {
+    use CanLoadRelationships;
+    public function __construct(){
+        $this->middleware('auth:sanctum')->except(['index','show']);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -46,10 +53,12 @@ class AttendeeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Event $event, Attendee $attendee)
     {
-        //
-    }
+        return new AttendeeResource(
+            $this->loadRelationships($attendee)
+        );
+    } 
 
     /**
      * Update the specified resource in storage.
@@ -62,8 +71,13 @@ class AttendeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event ,Attendee $attendee)
     {
+        $this->authorize('delete-attendee',[$event,$attendee]);
+        $attendee->delete();
+        return response()->json([
+            'message'=>'Attendee successfully deleted'
+        ]);
         //
     }
 }
